@@ -69,7 +69,7 @@ INSERT INTO services ("id", "name", "description", "category", "price", "image",
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Blog Posts
-INSERT INTO blog_posts ("id", "title", "slug", "content", "excerpt", author_id, author_name, "tags", "category", is_published, published_at) VALUES
+INSERT INTO blog_posts ("id", "title", "slug", "content", "excerpt", author_id, author_name, "tags", "category", "published", published_at) VALUES
 ('blog_001', 'The Future of AI in Scientific Research', 'future-ai-scientific-research', 'AI is revolutionizing how we conduct scientific research...', 'Explore how artificial intelligence is transforming scientific discovery and research methodologies.', 'usr_004', 'Dr. Layla Rahman', 'AI,Research,Science', 'Research', true, NOW()),
 ('blog_002', 'Building Scalable ML Pipelines', 'scalable-ml-pipelines', 'Learn the best practices for building production-ready ML pipelines...', 'A comprehensive guide to designing and implementing scalable machine learning infrastructure.', 'usr_013', 'Dr. Amir Patel', 'ML,Engineering,Tutorial', 'Engineering', true, NOW()),
 ('blog_003', 'EdTech Trends 2026', 'edtech-trends-2026', 'The landscape of educational technology is evolving rapidly...', 'Discover the top EdTech trends shaping the future of learning in 2026.', 'usr_005', 'Youssef Mansour', 'EdTech,Education,Trends', 'Education', true, NOW()),
@@ -77,7 +77,7 @@ INSERT INTO blog_posts ("id", "title", "slug", "content", "excerpt", author_id, 
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Threads
-INSERT INTO forum_threads ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", is_published) VALUES
+INSERT INTO forum_threads ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", "published") VALUES
 ('thread_001', 'Welcome to InnovaSci Forum', 'Welcome everyone! This is a space for researchers, developers, and AI enthusiasts to connect and collaborate.', 'welcome-forum', 'usr_001', 'Ahmad Al-Farsi', 'General', 245, 12, true),
 ('thread_002', 'Best Practices for Model Deployment', 'What are your recommended strategies for deploying ML models at scale?', 'model-deployment-best-practices', 'usr_013', 'Dr. Amir Patel', 'AI/ML', 189, 8, true),
 ('thread_003', 'EdTech Integration Tips', 'Sharing some tips for integrating our Learn Platform with existing systems.', 'edtech-integration-tips', 'usr_016', 'Aisha Mohammed', 'EdTech', 156, 6, true)
