@@ -6,16 +6,28 @@
 -- =====================================================
 -- SECTION 1: DROP EXISTING OBJECTS (for clean reinstall)
 -- =====================================================
-DROP TRIGGER IF EXISTS audit_user_changes ON users;
-DROP TRIGGER IF EXISTS audit_profile_changes ON profiles;
-DROP TRIGGER IF EXISTS audit_product_changes ON products;
-DROP TRIGGER IF EXISTS audit_service_changes ON services;
-DROP TRIGGER IF EXISTS audit_blog_changes ON blog_posts;
-DROP TRIGGER IF EXISTS audit_forum_changes ON forum_threads;
-DROP TRIGGER IF EXISTS audit_workspace_changes ON workspace_tasks;
+-- Drop triggers first (they depend on functions)
+DROP TRIGGER IF EXISTS audit_users_changes ON users CASCADE;
+DROP TRIGGER IF EXISTS audit_profiles_changes ON profiles CASCADE;
+DROP TRIGGER IF EXISTS audit_products_changes ON products CASCADE;
+DROP TRIGGER IF EXISTS audit_services_changes ON services CASCADE;
+DROP TRIGGER IF EXISTS audit_blog_changes ON blog_posts CASCADE;
+DROP TRIGGER IF EXISTS audit_forum_changes ON forum_threads CASCADE;
+DROP TRIGGER IF EXISTS audit_workspace_changes ON workspace_tasks CASCADE;
+DROP TRIGGER IF EXISTS update_users_updated_at ON users CASCADE;
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles CASCADE;
+DROP TRIGGER IF EXISTS update_products_updated_at ON products CASCADE;
+DROP TRIGGER IF EXISTS update_services_updated_at ON services CASCADE;
+DROP TRIGGER IF EXISTS update_blog_posts_updated_at ON blog_posts CASCADE;
+DROP TRIGGER IF EXISTS update_forum_threads_updated_at ON forum_threads CASCADE;
+DROP TRIGGER IF EXISTS update_forum_replies_updated_at ON forum_replies CASCADE;
+DROP TRIGGER IF EXISTS update_ai_sessions_updated_at ON ai_sessions CASCADE;
+DROP TRIGGER IF EXISTS update_workspace_projects_updated_at ON workspace_projects CASCADE;
+DROP TRIGGER IF EXISTS update_workspace_tasks_updated_at ON workspace_tasks CASCADE;
 
-DROP FUNCTION IF EXISTS audit_trigger_function();
-DROP FUNCTION IF EXISTS update_updated_at_column();
+-- Drop functions
+DROP FUNCTION IF EXISTS audit_trigger_function() CASCADE;
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 
 DROP TABLE IF EXISTS audit_logs CASCADE;
 DROP TABLE IF EXISTS workspace_tasks CASCADE;
