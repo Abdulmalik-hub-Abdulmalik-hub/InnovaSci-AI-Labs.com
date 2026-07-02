@@ -2,7 +2,7 @@
 -- Run this in Supabase SQL Editor AFTER schema.sql
 
 -- Insert Users (password is 'innovasci123' hashed with bcrypt)
-INSERT INTO "User" ("id", "email", password_hash, full_name, "role", is_active) VALUES
+INSERT INTO "User" ("id", "email", password_hash, full_name, user_role, is_active) VALUES
 ('usr_001', 'admin@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Ahmad Al-Farsi', 'SYSTEM_ADMINISTRATOR', true),
 ('usr_002', 'ceo@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Fatima Al-Zahra', 'CEO', true),
 ('usr_003', 'cto@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Omar Khalil', 'CTO', true),
@@ -69,7 +69,7 @@ INSERT INTO "Service" ("id", "name", "description", "category", "price", "image"
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Blog Posts
-INSERT INTO "BlogPost" ("id", "title", "slug", "content", "excerpt", "authorId", "authorName", "tags", "category", "published", published_at) VALUES
+INSERT INTO "BlogPost" ("id", "title", "slug", "content", "excerpt", author_id, author_name, "tags", "category", is_published, published_at) VALUES
 ('blog_001', 'The Future of AI in Scientific Research', 'future-ai-scientific-research', 'AI is revolutionizing how we conduct scientific research...', 'Explore how artificial intelligence is transforming scientific discovery and research methodologies.', 'usr_004', 'Dr. Layla Rahman', 'AI,Research,Science', 'Research', true, NOW()),
 ('blog_002', 'Building Scalable ML Pipelines', 'scalable-ml-pipelines', 'Learn the best practices for building production-ready ML pipelines...', 'A comprehensive guide to designing and implementing scalable machine learning infrastructure.', 'usr_013', 'Dr. Amir Patel', 'ML,Engineering,Tutorial', 'Engineering', true, NOW()),
 ('blog_003', 'EdTech Trends 2026', 'edtech-trends-2026', 'The landscape of educational technology is evolving rapidly...', 'Discover the top EdTech trends shaping the future of learning in 2026.', 'usr_005', 'Youssef Mansour', 'EdTech,Education,Trends', 'Education', true, NOW()),
@@ -77,14 +77,14 @@ INSERT INTO "BlogPost" ("id", "title", "slug", "content", "excerpt", "authorId",
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Threads
-INSERT INTO "ForumThread" ("id", "title", "content", "slug", "authorId", "authorName", "category", "views", "replies", "published") VALUES
+INSERT INTO "ForumThread" ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", is_published) VALUES
 ('thread_001', 'Welcome to InnovaSci Forum', 'Welcome everyone! This is a space for researchers, developers, and AI enthusiasts to connect and collaborate.', 'welcome-forum', 'usr_001', 'Ahmad Al-Farsi', 'General', 245, 12, true),
 ('thread_002', 'Best Practices for Model Deployment', 'What are your recommended strategies for deploying ML models at scale?', 'model-deployment-best-practices', 'usr_013', 'Dr. Amir Patel', 'AI/ML', 189, 8, true),
 ('thread_003', 'EdTech Integration Tips', 'Sharing some tips for integrating our Learn Platform with existing systems.', 'edtech-integration-tips', 'usr_016', 'Aisha Mohammed', 'EdTech', 156, 6, true)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Replies
-INSERT INTO "ForumReply" ("id", "threadId", "content", "authorId", "authorName") VALUES
+INSERT INTO "ForumReply" ("id", thread_id, "content", author_id, author_name) VALUES
 ('reply_001', 'thread_002', 'Great topic! I recommend using Kubernetes for orchestration and implementing proper monitoring.', 'usr_007', 'James Chen'),
 ('reply_002', 'thread_002', 'Also consider using model caching and implementing A/B testing for gradual rollouts.', 'usr_014', 'Wei Zhang'),
 ('reply_003', 'thread_001', 'Excited to be part of this community! Looking forward to great discussions.', 'usr_022', 'Dr. Emma Thompson')
@@ -95,20 +95,20 @@ INSERT INTO "AISession" ("id", user_id, "title") VALUES
 ('sess_001', 'usr_001', 'Getting Started with AI Core')
 ON CONFLICT ("id") DO NOTHING;
 
-INSERT INTO "AIMessage" ("id", "sessionId", "role", "content") VALUES
+INSERT INTO "AIMessage" ("id", session_id, "role", "content") VALUES
 ('msg_001', 'sess_001', 'user', 'How do I get started with InnovaSci AI Core?'),
 ('msg_002', 'sess_001', 'assistant', 'Welcome to InnovaSci AI Core! To get started, you can...')
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Workspace Projects
-INSERT INTO "WorkspaceProject" ("id", "name", "description", "ownerId", "status") VALUES
+INSERT INTO "WorkspaceProject" ("id", "name", "description", owner_id, "status") VALUES
 ('proj_001', 'Q4 AI Initiative', 'Quarterly AI research and development goals', 'usr_004', 'Active'),
 ('proj_002', 'EdTech Platform Upgrade', 'Upgrading our learning management system', 'usr_005', 'Active'),
 ('proj_003', 'Research Paper Publication', 'Submitting our latest findings to Nature', 'usr_006', 'In Progress')
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Workspace Tasks
-INSERT INTO "WorkspaceTask" ("id", "projectId", "title", "status", "priority", "assigneeId", "assigneeName") VALUES
+INSERT INTO "WorkspaceTask" ("id", project_id, "title", "status", "priority", "assigneeId", assignee_name) VALUES
 ('task_001', 'proj_001', 'Complete MLOps pipeline setup', 'IN_PROGRESS', 'HIGH', 'usr_013', 'Dr. Amir Patel'),
 ('task_002', 'proj_001', 'Model performance optimization', 'TODO', 'MEDIUM', 'usr_014', 'Wei Zhang'),
 ('task_003', 'proj_002', 'Update learning modules', 'IN_PROGRESS', 'HIGH', 'usr_016', 'Aisha Mohammed'),
