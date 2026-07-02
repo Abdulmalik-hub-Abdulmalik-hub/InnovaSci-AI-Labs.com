@@ -310,20 +310,40 @@ DECLARE
   audit_details JSONB;
   audit_entity TEXT;
   entity_id_val TEXT;
+  audit_user_id TEXT;
 BEGIN
   audit_entity := TG_TABLE_NAME;
   
   IF TG_OP = 'INSERT' THEN
     audit_action := 'CREATE';
     audit_details := jsonb_build_object('new', to_jsonb(NEW));
+    -- Try to get user_id from new row if it exists
+    IF NEW IS NOT NULL AND (SELECT count(*) > 0 FROM jsonb_object_keys(NEW) k WHERE k = 'user_id') > 0 THEN
+      audit_user_id := NEW.user_id;
+    ELSE
+      audit_user_id := NULL;
+    END IF;
   ELSIF TG_OP = 'UPDATE' THEN
     audit_action := 'UPDATE';
     audit_details := jsonb_build_object('old', to_jsonb(OLD), 'new', to_jsonb(NEW));
+    IF NEW IS NOT NULL AND (SELECT count(*) > 0 FROM jsonb_object_keys(NEW) k WHERE k = 'user_id') > 0 THEN
+      audit_user_id := NEW.user_id;
+    ELSIF OLD IS NOT NULL AND (SELECT count(*) > 0 FROM jsonb_object_keys(OLD) k WHERE k = 'user_id') > 0 THEN
+      audit_user_id := OLD.user_id;
+    ELSE
+      audit_user_id := NULL;
+    END IF;
   ELSIF TG_OP = 'DELETE' THEN
     audit_action := 'DELETE';
     audit_details := jsonb_build_object('old', to_jsonb(OLD));
+    IF OLD IS NOT NULL AND (SELECT count(*) > 0 FROM jsonb_object_keys(OLD) k WHERE k = 'user_id') > 0 THEN
+      audit_user_id := OLD.user_id;
+    ELSE
+      audit_user_id := NULL;
+    END IF;
   END IF;
   
+  -- Get entity_id from the primary key column
   IF NEW IS NOT NULL THEN
     EXECUTE 'SELECT ($1.' || TG_ARGV[0] || ')::TEXT' INTO entity_id_val USING NEW;
   ELSIF OLD IS NOT NULL THEN
@@ -336,7 +356,7 @@ BEGIN
     audit_action,
     audit_entity,
     entity_id_val,
-    COALESCE(NEW.user_id, OLD.user_id, NULL),
+    audit_user_id,
     audit_details
   );
   
@@ -344,30 +364,37 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS audit_users_changes ON users;
 CREATE TRIGGER audit_users_changes
   AFTER INSERT OR UPDATE OR DELETE ON users
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_profiles_changes ON profiles;
 CREATE TRIGGER audit_profiles_changes
   AFTER INSERT OR UPDATE OR DELETE ON profiles
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_products_changes ON products;
 CREATE TRIGGER audit_products_changes
   AFTER INSERT OR UPDATE OR DELETE ON products
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_services_changes ON services;
 CREATE TRIGGER audit_services_changes
   AFTER INSERT OR UPDATE OR DELETE ON services
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_blog_changes ON blog_posts;
 CREATE TRIGGER audit_blog_changes
   AFTER INSERT OR UPDATE OR DELETE ON blog_posts
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_forum_changes ON forum_threads;
 CREATE TRIGGER audit_forum_changes
   AFTER INSERT OR UPDATE OR DELETE ON forum_threads
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
+DROP TRIGGER IF EXISTS audit_workspace_changes ON workspace_tasks;
 CREATE TRIGGER audit_workspace_changes
   AFTER INSERT OR UPDATE OR DELETE ON workspace_tasks
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
