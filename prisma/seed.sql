@@ -77,7 +77,7 @@ INSERT INTO blog_posts ("id", "title", "slug", "content", "excerpt", author_id, 
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Threads
-INSERT INTO forum_threads ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", "published") VALUES
+INSERT INTO forum_threads ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", is_pinned) VALUES
 ('thread_001', 'Welcome to InnovaSci Forum', 'Welcome everyone! This is a space for researchers, developers, and AI enthusiasts to connect and collaborate.', 'welcome-forum', 'usr_001', 'Ahmad Al-Farsi', 'General', 245, 12, true),
 ('thread_002', 'Best Practices for Model Deployment', 'What are your recommended strategies for deploying ML models at scale?', 'model-deployment-best-practices', 'usr_013', 'Dr. Amir Patel', 'AI/ML', 189, 8, true),
 ('thread_003', 'EdTech Integration Tips', 'Sharing some tips for integrating our Learn Platform with existing systems.', 'edtech-integration-tips', 'usr_016', 'Aisha Mohammed', 'EdTech', 156, 6, true)
