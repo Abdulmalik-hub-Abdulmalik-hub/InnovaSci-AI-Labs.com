@@ -2,7 +2,7 @@
 -- Run this in Supabase SQL Editor AFTER schema.sql
 
 -- Insert Users (password is 'innovasci123' hashed with bcrypt)
-INSERT INTO "User" ("id", "email", password_hash, full_name, user_role, is_active) VALUES
+INSERT INTO users ("id", "email", password_hash, full_name, user_role, is_active) VALUES
 ('usr_001', 'admin@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Ahmad Al-Farsi', 'SYSTEM_ADMINISTRATOR', true),
 ('usr_002', 'ceo@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Fatima Al-Zahra', 'CEO', true),
 ('usr_003', 'cto@innovasci.com', '$2a$10$8K1p/a0dL1LXMIgp1L0wOe7RmYqWkfKnq4vXt1mHOhP7qWqNWMG3a', 'Omar Khalil', 'CTO', true),
@@ -28,7 +28,7 @@ INSERT INTO "User" ("id", "email", password_hash, full_name, user_role, is_activ
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Profiles
-INSERT INTO "Profile" ("id", user_id, "bio", "qualification", "expertise", "title", "department", "location") VALUES
+INSERT INTO profiles ("id", user_id, "bio", "qualification", "expertise", "title", "department", "location") VALUES
 ('prf_001', 'usr_001', 'System Administrator with 15+ years experience', 'MSc Computer Science', 'Infrastructure, Security', 'System Administrator', 'IT', 'Dubai, UAE'),
 ('prf_002', 'usr_002', 'Visionary CEO leading InnovaSci AI Labs', 'MBA Harvard, PhD AI', 'Strategic Planning, AI Leadership', 'Chief Executive Officer', 'Executive', 'Dubai, UAE'),
 ('prf_003', 'usr_003', 'CTO driving technical innovation', 'PhD Computer Engineering', 'Cloud Architecture, AI Systems', 'Chief Technology Officer', 'Engineering', 'Dubai, UAE'),
@@ -54,14 +54,14 @@ INSERT INTO "Profile" ("id", user_id, "bio", "qualification", "expertise", "titl
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Products
-INSERT INTO "Product" ("id", "name", "description", "category", "price", "image", "features", is_active) VALUES
+INSERT INTO products ("id", "name", "description", "category", "price", "image", "features", is_active) VALUES
 ('prod_001', 'InnovaSci AI Core', 'Enterprise-grade AI infrastructure platform for building and deploying production ML models', 'AI Infrastructure', 999.00, 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800', 'Model Training|Automated ML Pipelines|GPU Acceleration|Model Versioning', true),
 ('prod_002', 'InnovaSci Research Suite', 'Comprehensive research platform with data analysis, visualization, and collaboration tools', 'Research Tools', 599.00, 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800', 'Data Visualization|Statistical Analysis|Team Collaboration|Paper Writing Tools', true),
 ('prod_003', 'InnovaSci Learn Platform', 'Adaptive learning management system with AI-powered personalization', 'EdTech', 299.00, 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800', 'Adaptive Learning|Progress Tracking|Interactive Content|Gamification', true)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Services
-INSERT INTO "Service" ("id", "name", "description", "category", "price", "image", "features", is_active) VALUES
+INSERT INTO services ("id", "name", "description", "category", "price", "image", "features", is_active) VALUES
 ('svc_001', 'Deep Learning Development', 'Custom deep learning model development and training for your specific use cases', 'AI Development', 5000.00, 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800', 'Custom Architecture Design|Transfer Learning|Fine-tuning|Model Optimization', true),
 ('svc_002', 'Physics Simulations', 'High-fidelity physics simulations for research and industrial applications', 'Research Services', 3500.00, 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800', 'Computational Fluid Dynamics|Structural Analysis|Thermal Modeling|Multi-physics Coupling', true),
 ('svc_003', 'Chemistry Modeling', 'Molecular modeling and chemical reaction simulations', 'Research Services', 4000.00, 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800', 'Molecular Dynamics|Quantum Chemistry|Drug Discovery|Property Prediction', true),
@@ -69,7 +69,7 @@ INSERT INTO "Service" ("id", "name", "description", "category", "price", "image"
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Blog Posts
-INSERT INTO "BlogPost" ("id", "title", "slug", "content", "excerpt", author_id, author_name, "tags", "category", is_published, published_at) VALUES
+INSERT INTO blog_posts ("id", "title", "slug", "content", "excerpt", author_id, author_name, "tags", "category", is_published, published_at) VALUES
 ('blog_001', 'The Future of AI in Scientific Research', 'future-ai-scientific-research', 'AI is revolutionizing how we conduct scientific research...', 'Explore how artificial intelligence is transforming scientific discovery and research methodologies.', 'usr_004', 'Dr. Layla Rahman', 'AI,Research,Science', 'Research', true, NOW()),
 ('blog_002', 'Building Scalable ML Pipelines', 'scalable-ml-pipelines', 'Learn the best practices for building production-ready ML pipelines...', 'A comprehensive guide to designing and implementing scalable machine learning infrastructure.', 'usr_013', 'Dr. Amir Patel', 'ML,Engineering,Tutorial', 'Engineering', true, NOW()),
 ('blog_003', 'EdTech Trends 2026', 'edtech-trends-2026', 'The landscape of educational technology is evolving rapidly...', 'Discover the top EdTech trends shaping the future of learning in 2026.', 'usr_005', 'Youssef Mansour', 'EdTech,Education,Trends', 'Education', true, NOW()),
@@ -77,38 +77,38 @@ INSERT INTO "BlogPost" ("id", "title", "slug", "content", "excerpt", author_id, 
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Threads
-INSERT INTO "ForumThread" ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", is_published) VALUES
+INSERT INTO forum_threads ("id", "title", "content", "slug", author_id, author_name, "category", "views", "replies", is_published) VALUES
 ('thread_001', 'Welcome to InnovaSci Forum', 'Welcome everyone! This is a space for researchers, developers, and AI enthusiasts to connect and collaborate.', 'welcome-forum', 'usr_001', 'Ahmad Al-Farsi', 'General', 245, 12, true),
 ('thread_002', 'Best Practices for Model Deployment', 'What are your recommended strategies for deploying ML models at scale?', 'model-deployment-best-practices', 'usr_013', 'Dr. Amir Patel', 'AI/ML', 189, 8, true),
 ('thread_003', 'EdTech Integration Tips', 'Sharing some tips for integrating our Learn Platform with existing systems.', 'edtech-integration-tips', 'usr_016', 'Aisha Mohammed', 'EdTech', 156, 6, true)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Forum Replies
-INSERT INTO "ForumReply" ("id", thread_id, "content", author_id, author_name) VALUES
+INSERT INTO forum_replies ("id", thread_id, "content", author_id, author_name) VALUES
 ('reply_001', 'thread_002', 'Great topic! I recommend using Kubernetes for orchestration and implementing proper monitoring.', 'usr_007', 'James Chen'),
 ('reply_002', 'thread_002', 'Also consider using model caching and implementing A/B testing for gradual rollouts.', 'usr_014', 'Wei Zhang'),
 ('reply_003', 'thread_001', 'Excited to be part of this community! Looking forward to great discussions.', 'usr_022', 'Dr. Emma Thompson')
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert AI Sessions and Messages
-INSERT INTO "AISession" ("id", user_id, "title") VALUES
+INSERT INTO ai_sessions ("id", user_id, "title") VALUES
 ('sess_001', 'usr_001', 'Getting Started with AI Core')
 ON CONFLICT ("id") DO NOTHING;
 
-INSERT INTO "AIMessage" ("id", session_id, "role", "content") VALUES
+INSERT INTO ai_messages ("id", session_id, "role", "content") VALUES
 ('msg_001', 'sess_001', 'user', 'How do I get started with InnovaSci AI Core?'),
 ('msg_002', 'sess_001', 'assistant', 'Welcome to InnovaSci AI Core! To get started, you can...')
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Workspace Projects
-INSERT INTO "WorkspaceProject" ("id", "name", "description", owner_id, "status") VALUES
+INSERT INTO workspace_projects ("id", "name", "description", owner_id, "status") VALUES
 ('proj_001', 'Q4 AI Initiative', 'Quarterly AI research and development goals', 'usr_004', 'Active'),
 ('proj_002', 'EdTech Platform Upgrade', 'Upgrading our learning management system', 'usr_005', 'Active'),
 ('proj_003', 'Research Paper Publication', 'Submitting our latest findings to Nature', 'usr_006', 'In Progress')
 ON CONFLICT ("id") DO NOTHING;
 
 -- Insert Workspace Tasks
-INSERT INTO "WorkspaceTask" ("id", project_id, "title", "status", "priority", "assigneeId", assignee_name) VALUES
+INSERT INTO workspace_tasks ("id", project_id, "title", "status", "priority", assignee_id, assignee_name) VALUES
 ('task_001', 'proj_001', 'Complete MLOps pipeline setup', 'IN_PROGRESS', 'HIGH', 'usr_013', 'Dr. Amir Patel'),
 ('task_002', 'proj_001', 'Model performance optimization', 'TODO', 'MEDIUM', 'usr_014', 'Wei Zhang'),
 ('task_003', 'proj_002', 'Update learning modules', 'IN_PROGRESS', 'HIGH', 'usr_016', 'Aisha Mohammed'),

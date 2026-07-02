@@ -16,7 +16,7 @@ CREATE TYPE "TaskStatus" AS ENUM ('TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE');
 CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
 
 -- Users Table
-CREATE TABLE "User" (
+CREATE TABLE users (
   "id" TEXT PRIMARY KEY,
   "email" TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE "User" (
 );
 
 -- Profiles Table
-CREATE TABLE "Profile" (
+CREATE TABLE profiles (
   "id" TEXT PRIMARY KEY,
-  user_id TEXT UNIQUE NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
+  user_id TEXT UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   "bio" TEXT,
   "qualification" TEXT,
   "expertise" TEXT,
@@ -51,7 +51,7 @@ CREATE TABLE "Profile" (
 );
 
 -- Products Table
-CREATE TABLE "Product" (
+CREATE TABLE products (
   "id" TEXT PRIMARY KEY,
   "name" TEXT NOT NULL,
   "description" TEXT,
@@ -66,7 +66,7 @@ CREATE TABLE "Product" (
 );
 
 -- Services Table
-CREATE TABLE "Service" (
+CREATE TABLE services (
   "id" TEXT PRIMARY KEY,
   "name" TEXT NOT NULL,
   "description" TEXT,
@@ -81,14 +81,14 @@ CREATE TABLE "Service" (
 );
 
 -- Blog Posts Table
-CREATE TABLE "BlogPost" (
+CREATE TABLE blog_posts (
   "id" TEXT PRIMARY KEY,
   "title" TEXT NOT NULL,
   "slug" TEXT UNIQUE NOT NULL,
   "content" TEXT,
   "excerpt" TEXT,
   cover_image TEXT,
-  author_id TEXT REFERENCES "User"(id),
+  author_id TEXT REFERENCES users(id),
   author_name TEXT,
   "tags" TEXT,
   "category" TEXT,
@@ -99,12 +99,12 @@ CREATE TABLE "BlogPost" (
 );
 
 -- Forum Threads Table
-CREATE TABLE "ForumThread" (
+CREATE TABLE forum_threads (
   "id" TEXT PRIMARY KEY,
   "title" TEXT NOT NULL,
   "content" TEXT NOT NULL,
   "slug" TEXT UNIQUE NOT NULL,
-  author_id TEXT REFERENCES "User"(id),
+  author_id TEXT REFERENCES users(id),
   author_name TEXT,
   "category" TEXT,
   "tags" TEXT,
@@ -117,11 +117,11 @@ CREATE TABLE "ForumThread" (
 );
 
 -- Forum Replies Table
-CREATE TABLE "ForumReply" (
+CREATE TABLE forum_replies (
   "id" TEXT PRIMARY KEY,
-  thread_id TEXT NOT NULL REFERENCES "ForumThread"(id) ON DELETE CASCADE,
+  thread_id TEXT NOT NULL REFERENCES forum_threads(id) ON DELETE CASCADE,
   "content" TEXT NOT NULL,
-  author_id TEXT REFERENCES "User"(id),
+  author_id TEXT REFERENCES users(id),
   author_name TEXT,
   is_accepted BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -129,9 +129,9 @@ CREATE TABLE "ForumReply" (
 );
 
 -- AI Chat Sessions Table
-CREATE TABLE "AISession" (
+CREATE TABLE ai_sessions (
   "id" TEXT PRIMARY KEY,
-  user_id TEXT REFERENCES "User"(id),
+  user_id TEXT REFERENCES users(id),
   "title" TEXT,
   "context" TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -139,16 +139,16 @@ CREATE TABLE "AISession" (
 );
 
 -- AI Chat Messages Table
-CREATE TABLE "AIMessage" (
+CREATE TABLE ai_messages (
   "id" TEXT PRIMARY KEY,
-  session_id TEXT NOT NULL REFERENCES "AISession"(id) ON DELETE CASCADE,
+  session_id TEXT NOT NULL REFERENCES ai_sessions(id) ON DELETE CASCADE,
   "role" TEXT NOT NULL,
   "content" TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Newsletter Subscribers Table
-CREATE TABLE "NewsletterSubscriber" (
+CREATE TABLE newsletter_subscribers (
   "id" TEXT PRIMARY KEY,
   "email" TEXT UNIQUE NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -157,25 +157,25 @@ CREATE TABLE "NewsletterSubscriber" (
 );
 
 -- Workspace Projects Table
-CREATE TABLE "WorkspaceProject" (
+CREATE TABLE workspace_projects (
   "id" TEXT PRIMARY KEY,
   "name" TEXT NOT NULL,
   "description" TEXT,
-  owner_id TEXT REFERENCES "User"(id),
+  owner_id TEXT REFERENCES users(id),
   "status" TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Workspace Tasks Table
-CREATE TABLE "WorkspaceTask" (
+CREATE TABLE workspace_tasks (
   "id" TEXT PRIMARY KEY,
-  project_id TEXT REFERENCES "WorkspaceProject"(id) ON DELETE CASCADE,
+  project_id TEXT REFERENCES workspace_projects(id) ON DELETE CASCADE,
   "title" TEXT NOT NULL,
   "description" TEXT,
   "status" "TaskStatus" DEFAULT 'TODO',
   "priority" "TaskPriority" DEFAULT 'MEDIUM',
-  "assigneeId" TEXT REFERENCES "User"(id),
+  "assigneeId" TEXT REFERENCES users(id),
   assignee_name TEXT,
   due_date TIMESTAMP,
   completed_at TIMESTAMP,
@@ -184,12 +184,12 @@ CREATE TABLE "WorkspaceTask" (
 );
 
 -- Audit Logs Table
-CREATE TABLE "AuditLog" (
+CREATE TABLE audit_logs (
   "id" TEXT PRIMARY KEY,
   "action" TEXT NOT NULL,
   "entity" TEXT NOT NULL,
   entity_id TEXT,
-  user_id TEXT REFERENCES "User"(id),
+  user_id TEXT REFERENCES users(id),
   "details" TEXT,
   ip_address TEXT,
   user_agent TEXT,
@@ -197,17 +197,17 @@ CREATE TABLE "AuditLog" (
 );
 
 -- Create Indexes
-CREATE INDEX "User_email_idx" ON "User"(email);
-CREATE INDEX "User_role_idx" ON "User"(user_role);
-CREATE INDEX "Profile_user_id_idx" ON "Profile"(user_id);
-CREATE INDEX "BlogPost_author_id_idx" ON "BlogPost"(author_id);
-CREATE INDEX "BlogPost_slug_idx" ON "BlogPost"(slug);
-CREATE INDEX "ForumThread_author_id_idx" ON "ForumThread"(author_id);
-CREATE INDEX "ForumThread_slug_idx" ON "ForumThread"(slug);
-CREATE INDEX "ForumReply_thread_id_idx" ON "ForumReply"(thread_id);
-CREATE INDEX "AISession_user_id_idx" ON "AISession"(user_id);
-CREATE INDEX "AIMessage_session_id_idx" ON "AIMessage"(session_id);
-CREATE INDEX "WorkspaceTask_project_id_idx" ON "WorkspaceTask"(project_id);
-CREATE INDEX "WorkspaceTask_assignee_id_idx" ON "WorkspaceTask"(assignee_id);
-CREATE INDEX "AuditLog_user_id_idx" ON "AuditLog"(user_id);
-CREATE INDEX "AuditLog_created_at_idx" ON "AuditLog"(created_at);
+CREATE INDEX "User_email_idx" ON users(email);
+CREATE INDEX "User_role_idx" ON users(user_role);
+CREATE INDEX "Profile_user_id_idx" ON profiles(user_id);
+CREATE INDEX "BlogPost_author_id_idx" ON blog_posts(author_id);
+CREATE INDEX "BlogPost_slug_idx" ON blog_posts(slug);
+CREATE INDEX "ForumThread_author_id_idx" ON forum_threads(author_id);
+CREATE INDEX "ForumThread_slug_idx" ON forum_threads(slug);
+CREATE INDEX "ForumReply_thread_id_idx" ON forum_replies(thread_id);
+CREATE INDEX "AISession_user_id_idx" ON ai_sessions(user_id);
+CREATE INDEX "AIMessage_session_id_idx" ON ai_messages(session_id);
+CREATE INDEX "WorkspaceTask_project_id_idx" ON workspace_tasks(project_id);
+CREATE INDEX "WorkspaceTask_assignee_id_idx" ON workspace_tasks(assignee_id);
+CREATE INDEX "AuditLog_user_id_idx" ON audit_logs(user_id);
+CREATE INDEX "AuditLog_created_at_idx" ON audit_logs(created_at);
