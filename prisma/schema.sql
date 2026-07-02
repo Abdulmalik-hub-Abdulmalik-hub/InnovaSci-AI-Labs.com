@@ -175,7 +175,7 @@ CREATE TABLE workspace_tasks (
   "description" TEXT,
   "status" "TaskStatus" DEFAULT 'TODO',
   "priority" "TaskPriority" DEFAULT 'MEDIUM',
-  "assigneeId" TEXT REFERENCES users(id),
+  assignee_id TEXT REFERENCES users(id),
   assignee_name TEXT,
   due_date TIMESTAMP,
   completed_at TIMESTAMP,
