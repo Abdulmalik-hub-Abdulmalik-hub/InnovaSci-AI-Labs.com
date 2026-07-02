@@ -112,5 +112,5 @@ INSERT INTO workspace_tasks ("id", project_id, "title", "status", "priority", as
 ('task_001', 'proj_001', 'Complete MLOps pipeline setup', 'IN_PROGRESS', 'HIGH', 'usr_013', 'Dr. Amir Patel'),
 ('task_002', 'proj_001', 'Model performance optimization', 'TODO', 'MEDIUM', 'usr_014', 'Wei Zhang'),
 ('task_003', 'proj_002', 'Update learning modules', 'IN_PROGRESS', 'HIGH', 'usr_016', 'Aisha Mohammed'),
-('task_004', 'proj_3', 'Draft abstract submission', 'IN_REVIEW', 'HIGH', 'usr_006', 'Dr. Sara Hassan')
+('task_004', 'proj_003', 'Draft abstract submission', 'IN_REVIEW', 'HIGH', 'usr_006', 'Dr. Sara Hassan')
 ON CONFLICT ("id") DO NOTHING;
