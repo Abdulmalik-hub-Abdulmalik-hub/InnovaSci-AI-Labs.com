@@ -373,23 +373,8 @@ CREATE TRIGGER audit_workspace_changes
   FOR EACH ROW EXECUTE FUNCTION audit_trigger_function('id');
 
 -- =====================================================
--- SECTION 7: ROW LEVEL SECURITY (RLS)
+-- SECTION 7: HELPER FUNCTIONS (must be before RLS policies)
 -- =====================================================
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE services ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE forum_threads ENABLE ROW LEVEL SECURITY;
-ALTER TABLE forum_replies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE workspace_projects ENABLE ROW LEVEL SECURITY;
-ALTER TABLE workspace_tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
-
--- Helper Functions
 CREATE OR REPLACE FUNCTION get_user_role()
 RETURNS TEXT AS $$
 BEGIN
@@ -420,96 +405,200 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- =====================================================
+-- SECTION 8: ENABLE ROW LEVEL SECURITY
+-- =====================================================
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forum_threads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forum_replies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workspace_projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workspace_tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- =====================================================
+-- SECTION 9: ROW LEVEL SECURITY POLICIES
+-- =====================================================
+
 -- USERS RLS
-CREATE POLICY users_select_all FOR SELECT ON users USING (true);
-CREATE POLICY users_insert_admin FOR INSERT ON users WITH CHECK (is_admin() = true);
-CREATE POLICY users_update_admin FOR UPDATE ON users USING (is_admin() = true OR user_id = id::TEXT);
-CREATE POLICY users_delete_admin FOR DELETE ON users USING (is_admin() = true);
+DROP POLICY IF EXISTS users_select_all ON users;
+CREATE POLICY users_select_all ON users FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS users_insert_admin ON users;
+CREATE POLICY users_insert_admin ON users FOR INSERT WITH CHECK (is_admin() = true);
+
+DROP POLICY IF EXISTS users_update_admin ON users;
+CREATE POLICY users_update_admin ON users FOR UPDATE USING (is_admin() = true OR (get_current_user_id() = id));
+
+DROP POLICY IF EXISTS users_delete_admin ON users;
+CREATE POLICY users_delete_admin ON users FOR DELETE USING (is_admin() = true);
 
 -- PROFILES RLS
-CREATE POLICY profiles_select_all FOR SELECT ON profiles USING (true);
-CREATE POLICY profiles_insert_owner FOR INSERT ON profiles WITH CHECK (user_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY profiles_update_owner FOR UPDATE ON profiles USING (user_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY profiles_delete_admin FOR DELETE ON profiles USING (is_admin() = true);
+DROP POLICY IF EXISTS profiles_select_all ON profiles;
+CREATE POLICY profiles_select_all ON profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS profiles_insert_owner ON profiles;
+CREATE POLICY profiles_insert_owner ON profiles FOR INSERT WITH CHECK (user_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS profiles_update_owner ON profiles;
+CREATE POLICY profiles_update_owner ON profiles FOR UPDATE USING (user_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS profiles_delete_admin ON profiles;
+CREATE POLICY profiles_delete_admin ON profiles FOR DELETE USING (is_admin() = true);
 
 -- PRODUCTS RLS
-CREATE POLICY products_select_all FOR SELECT ON products USING (true);
-CREATE POLICY products_insert_admin FOR INSERT ON products WITH CHECK (is_admin() = true OR is_executive() = true);
-CREATE POLICY products_update_admin FOR UPDATE ON products USING (is_admin() = true OR is_executive() = true);
-CREATE POLICY products_delete_admin FOR DELETE ON products USING (is_admin() = true);
+DROP POLICY IF EXISTS products_select_all ON products;
+CREATE POLICY products_select_all ON products FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS products_insert_admin ON products;
+CREATE POLICY products_insert_admin ON products FOR INSERT WITH CHECK (is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS products_update_admin ON products;
+CREATE POLICY products_update_admin ON products FOR UPDATE USING (is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS products_delete_admin ON products;
+CREATE POLICY products_delete_admin ON products FOR DELETE USING (is_admin() = true);
 
 -- SERVICES RLS
-CREATE POLICY services_select_all FOR SELECT ON services USING (true);
-CREATE POLICY services_insert_admin FOR INSERT ON services WITH CHECK (is_admin() = true OR is_executive() = true);
-CREATE POLICY services_update_admin FOR UPDATE ON services USING (is_admin() = true OR is_executive() = true);
-CREATE POLICY services_delete_admin FOR DELETE ON services USING (is_admin() = true);
+DROP POLICY IF EXISTS services_select_all ON services;
+CREATE POLICY services_select_all ON services FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS services_insert_admin ON services;
+CREATE POLICY services_insert_admin ON services FOR INSERT WITH CHECK (is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS services_update_admin ON services;
+CREATE POLICY services_update_admin ON services FOR UPDATE USING (is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS services_delete_admin ON services;
+CREATE POLICY services_delete_admin ON services FOR DELETE USING (is_admin() = true);
 
 -- BLOG POSTS RLS
-CREATE POLICY blog_posts_select_published FOR SELECT ON blog_posts USING (published = true OR author_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY blog_posts_insert_author FOR INSERT ON blog_posts WITH CHECK (author_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY blog_posts_update_author FOR UPDATE ON blog_posts USING (author_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY blog_posts_delete_author FOR DELETE ON blog_posts USING (author_id = get_current_user_id() OR is_admin() = true);
+DROP POLICY IF EXISTS blog_posts_select_published ON blog_posts;
+CREATE POLICY blog_posts_select_published ON blog_posts FOR SELECT USING (published = true OR author_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS blog_posts_insert_author ON blog_posts;
+CREATE POLICY blog_posts_insert_author ON blog_posts FOR INSERT WITH CHECK (author_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS blog_posts_update_author ON blog_posts;
+CREATE POLICY blog_posts_update_author ON blog_posts FOR UPDATE USING (author_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS blog_posts_delete_author ON blog_posts;
+CREATE POLICY blog_posts_delete_author ON blog_posts FOR DELETE USING (author_id = get_current_user_id() OR is_admin() = true);
 
 -- FORUM THREADS RLS
-CREATE POLICY forum_threads_select_all FOR SELECT ON forum_threads USING (true);
-CREATE POLICY forum_threads_insert_user FOR INSERT ON forum_threads WITH CHECK (author_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
-CREATE POLICY forum_threads_update_author FOR UPDATE ON forum_threads USING (author_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY forum_threads_delete_author FOR DELETE ON forum_threads USING (author_id = get_current_user_id() OR is_admin() = true);
+DROP POLICY IF EXISTS forum_threads_select_all ON forum_threads;
+CREATE POLICY forum_threads_select_all ON forum_threads FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS forum_threads_insert_user ON forum_threads;
+CREATE POLICY forum_threads_insert_user ON forum_threads FOR INSERT WITH CHECK (author_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
+
+DROP POLICY IF EXISTS forum_threads_update_author ON forum_threads;
+CREATE POLICY forum_threads_update_author ON forum_threads FOR UPDATE USING (author_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS forum_threads_delete_author ON forum_threads;
+CREATE POLICY forum_threads_delete_author ON forum_threads FOR DELETE USING (author_id = get_current_user_id() OR is_admin() = true);
 
 -- FORUM REPLIES RLS
-CREATE POLICY forum_replies_select_all FOR SELECT ON forum_replies USING (true);
-CREATE POLICY forum_replies_insert_user FOR INSERT ON forum_replies WITH CHECK (author_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
-CREATE POLICY forum_replies_update_author FOR UPDATE ON forum_replies USING (author_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY forum_replies_delete_author FOR DELETE ON forum_replies USING (author_id = get_current_user_id() OR is_admin() = true);
+DROP POLICY IF EXISTS forum_replies_select_all ON forum_replies;
+CREATE POLICY forum_replies_select_all ON forum_replies FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS forum_replies_insert_user ON forum_replies;
+CREATE POLICY forum_replies_insert_user ON forum_replies FOR INSERT WITH CHECK (author_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
+
+DROP POLICY IF EXISTS forum_replies_update_author ON forum_replies;
+CREATE POLICY forum_replies_update_author ON forum_replies FOR UPDATE USING (author_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS forum_replies_delete_author ON forum_replies;
+CREATE POLICY forum_replies_delete_author ON forum_replies FOR DELETE USING (author_id = get_current_user_id() OR is_admin() = true);
 
 -- AI SESSIONS RLS
-CREATE POLICY ai_sessions_select_owner FOR SELECT ON ai_sessions USING (user_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY ai_sessions_insert_owner FOR INSERT ON ai_sessions WITH CHECK (user_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
-CREATE POLICY ai_sessions_update_owner FOR UPDATE ON ai_sessions USING (user_id = get_current_user_id() OR is_admin() = true);
-CREATE POLICY ai_sessions_delete_owner FOR DELETE ON ai_sessions USING (user_id = get_current_user_id() OR is_admin() = true);
+DROP POLICY IF EXISTS ai_sessions_select_owner ON ai_sessions;
+CREATE POLICY ai_sessions_select_owner ON ai_sessions FOR SELECT USING (user_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS ai_sessions_insert_owner ON ai_sessions;
+CREATE POLICY ai_sessions_insert_owner ON ai_sessions FOR INSERT WITH CHECK (user_id = get_current_user_id() OR get_current_user_id() IS NOT NULL);
+
+DROP POLICY IF EXISTS ai_sessions_update_owner ON ai_sessions;
+CREATE POLICY ai_sessions_update_owner ON ai_sessions FOR UPDATE USING (user_id = get_current_user_id() OR is_admin() = true);
+
+DROP POLICY IF EXISTS ai_sessions_delete_owner ON ai_sessions;
+CREATE POLICY ai_sessions_delete_owner ON ai_sessions FOR DELETE USING (user_id = get_current_user_id() OR is_admin() = true);
 
 -- AI MESSAGES RLS
-CREATE POLICY ai_messages_select_owner FOR SELECT ON ai_messages USING (
+DROP POLICY IF EXISTS ai_messages_select_owner ON ai_messages;
+CREATE POLICY ai_messages_select_owner ON ai_messages FOR SELECT USING (
   EXISTS (SELECT 1 FROM ai_sessions s WHERE s.id = session_id AND (s.user_id = get_current_user_id() OR is_admin() = true))
 );
-CREATE POLICY ai_messages_insert_owner FOR INSERT ON ai_messages WITH CHECK (
+
+DROP POLICY IF EXISTS ai_messages_insert_owner ON ai_messages;
+CREATE POLICY ai_messages_insert_owner ON ai_messages FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM ai_sessions s WHERE s.id = session_id AND (s.user_id = get_current_user_id() OR is_admin() = true))
 );
-CREATE POLICY ai_messages_delete_owner FOR DELETE ON ai_messages USING (
+
+DROP POLICY IF EXISTS ai_messages_delete_owner ON ai_messages;
+CREATE POLICY ai_messages_delete_owner ON ai_messages FOR DELETE USING (
   EXISTS (SELECT 1 FROM ai_sessions s WHERE s.id = session_id AND (s.user_id = get_current_user_id() OR is_admin() = true))
 );
 
 -- NEWSLETTER RLS
-CREATE POLICY newsletter_select_admin FOR SELECT ON newsletter_subscribers USING (is_admin() = true);
-CREATE POLICY newsletter_insert_email FOR INSERT ON newsletter_subscribers WITH CHECK (true);
-CREATE POLICY newsletter_update_admin FOR UPDATE ON newsletter_subscribers USING (is_admin() = true);
-CREATE POLICY newsletter_delete_admin FOR DELETE ON newsletter_subscribers USING (is_admin() = true);
+DROP POLICY IF EXISTS newsletter_select_admin ON newsletter_subscribers;
+CREATE POLICY newsletter_select_admin ON newsletter_subscribers FOR SELECT USING (is_admin() = true);
+
+DROP POLICY IF EXISTS newsletter_insert_email ON newsletter_subscribers;
+CREATE POLICY newsletter_insert_email ON newsletter_subscribers FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS newsletter_update_admin ON newsletter_subscribers;
+CREATE POLICY newsletter_update_admin ON newsletter_subscribers FOR UPDATE USING (is_admin() = true);
+
+DROP POLICY IF EXISTS newsletter_delete_admin ON newsletter_subscribers;
+CREATE POLICY newsletter_delete_admin ON newsletter_subscribers FOR DELETE USING (is_admin() = true);
 
 -- WORKSPACE PROJECTS RLS
-CREATE POLICY workspace_projects_select_team FOR SELECT ON workspace_projects USING (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
-CREATE POLICY workspace_projects_insert_owner FOR INSERT ON workspace_projects WITH CHECK (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
-CREATE POLICY workspace_projects_update_owner FOR UPDATE ON workspace_projects USING (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
-CREATE POLICY workspace_projects_delete_owner FOR DELETE ON workspace_projects USING (owner_id = get_current_user_id() OR is_admin() = true);
+DROP POLICY IF EXISTS workspace_projects_select_team ON workspace_projects;
+CREATE POLICY workspace_projects_select_team ON workspace_projects FOR SELECT USING (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS workspace_projects_insert_owner ON workspace_projects;
+CREATE POLICY workspace_projects_insert_owner ON workspace_projects FOR INSERT WITH CHECK (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS workspace_projects_update_owner ON workspace_projects;
+CREATE POLICY workspace_projects_update_owner ON workspace_projects FOR UPDATE USING (owner_id = get_current_user_id() OR is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS workspace_projects_delete_owner ON workspace_projects;
+CREATE POLICY workspace_projects_delete_owner ON workspace_projects FOR DELETE USING (owner_id = get_current_user_id() OR is_admin() = true);
 
 -- WORKSPACE TASKS RLS
-CREATE POLICY workspace_tasks_select_assignee FOR SELECT ON workspace_tasks USING (
+DROP POLICY IF EXISTS workspace_tasks_select_assignee ON workspace_tasks;
+CREATE POLICY workspace_tasks_select_assignee ON workspace_tasks FOR SELECT USING (
   assignee_id = get_current_user_id() OR is_admin() = true OR is_executive() = true OR
   EXISTS (SELECT 1 FROM workspace_projects p WHERE p.id = project_id AND p.owner_id = get_current_user_id())
 );
-CREATE POLICY workspace_tasks_insert_team FOR INSERT ON workspace_tasks WITH CHECK (
+
+DROP POLICY IF EXISTS workspace_tasks_insert_team ON workspace_tasks;
+CREATE POLICY workspace_tasks_insert_team ON workspace_tasks FOR INSERT WITH CHECK (
   is_admin() = true OR is_executive() = true OR assignee_id = get_current_user_id()
 );
-CREATE POLICY workspace_tasks_update_assignee FOR UPDATE ON workspace_tasks USING (
+
+DROP POLICY IF EXISTS workspace_tasks_update_assignee ON workspace_tasks;
+CREATE POLICY workspace_tasks_update_assignee ON workspace_tasks FOR UPDATE USING (
   assignee_id = get_current_user_id() OR is_admin() = true OR is_executive() = true OR
   EXISTS (SELECT 1 FROM workspace_projects p WHERE p.id = project_id AND p.owner_id = get_current_user_id())
 );
-CREATE POLICY workspace_tasks_delete_admin FOR DELETE ON workspace_tasks USING (is_admin() = true OR is_executive() = true);
+
+DROP POLICY IF EXISTS workspace_tasks_delete_admin ON workspace_tasks;
+CREATE POLICY workspace_tasks_delete_admin ON workspace_tasks FOR DELETE USING (is_admin() = true OR is_executive() = true);
 
 -- AUDIT LOGS RLS
-CREATE POLICY audit_logs_select_admin FOR SELECT ON audit_logs USING (is_admin() = true);
+DROP POLICY IF EXISTS audit_logs_select_admin ON audit_logs;
+CREATE POLICY audit_logs_select_admin ON audit_logs FOR SELECT USING (is_admin() = true);
 
 -- =====================================================
--- SECTION 8: HELPER FUNCTIONS
+-- SECTION 10: HELPER FUNCTIONS
 -- =====================================================
 CREATE OR REPLACE FUNCTION increment_thread_views(thread_slug TEXT) RETURNS VOID AS $$
 BEGIN UPDATE forum_threads SET views = views + 1 WHERE slug = thread_slug; END;
