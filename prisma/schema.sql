@@ -19,18 +19,18 @@ CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
 CREATE TABLE "User" (
   "id" TEXT PRIMARY KEY,
   "email" TEXT UNIQUE NOT NULL,
-  "passwordHash" TEXT NOT NULL,
-  "fullName" TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  full_name TEXT NOT NULL,
   "role" "RoleType" NOT NULL DEFAULT 'EXTERNAL_RESEARCHER',
-  "isActive" BOOLEAN DEFAULT true,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Profiles Table
 CREATE TABLE "Profile" (
   "id" TEXT PRIMARY KEY,
-  "userId" TEXT UNIQUE NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
+  user_id TEXT UNIQUE NOT NULL REFERENCES "User"(id) ON DELETE CASCADE,
   "bio" TEXT,
   "qualification" TEXT,
   "expertise" TEXT,
@@ -38,16 +38,16 @@ CREATE TABLE "Profile" (
   "avatar" TEXT,
   "department" TEXT,
   "title" TEXT,
-  "linkedIn" TEXT,
+  linked_in TEXT,
   "website" TEXT,
   "location" TEXT,
   "yearsOfExperience" INTEGER,
   "publications" TEXT,
   "researchInterests" TEXT,
   "certifications" TEXT,
-  "teamName" TEXT,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  team_name TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Products Table
@@ -60,9 +60,9 @@ CREATE TABLE "Product" (
   "image" TEXT,
   "features" TEXT,
   "documentation" TEXT,
-  "isActive" BOOLEAN DEFAULT true,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Services Table
@@ -75,9 +75,9 @@ CREATE TABLE "Service" (
   "price" DECIMAL(10,2),
   "image" TEXT,
   "features" TEXT,
-  "isActive" BOOLEAN DEFAULT true,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Blog Posts Table
@@ -87,15 +87,15 @@ CREATE TABLE "BlogPost" (
   "slug" TEXT UNIQUE NOT NULL,
   "content" TEXT,
   "excerpt" TEXT,
-  "coverImage" TEXT,
+  cover_image TEXT,
   "authorId" TEXT REFERENCES "User"(id),
   "authorName" TEXT,
   "tags" TEXT,
   "category" TEXT,
   "published" BOOLEAN DEFAULT false,
-  "publishedAt" TIMESTAMP,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  published_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Forum Threads Table
@@ -110,10 +110,10 @@ CREATE TABLE "ForumThread" (
   "tags" TEXT,
   "views" INTEGER DEFAULT 0,
   "replies" INTEGER DEFAULT 0,
-  "isPinned" BOOLEAN DEFAULT false,
-  "isLocked" BOOLEAN DEFAULT false,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_pinned BOOLEAN DEFAULT false,
+  is_locked BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Forum Replies Table
@@ -123,19 +123,19 @@ CREATE TABLE "ForumReply" (
   "content" TEXT NOT NULL,
   "authorId" TEXT REFERENCES "User"(id),
   "authorName" TEXT,
-  "isAccepted" BOOLEAN DEFAULT false,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_accepted BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- AI Chat Sessions Table
 CREATE TABLE "AISession" (
   "id" TEXT PRIMARY KEY,
-  "userId" TEXT REFERENCES "User"(id),
+  user_id TEXT REFERENCES "User"(id),
   "title" TEXT,
   "context" TEXT,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- AI Chat Messages Table
@@ -144,16 +144,16 @@ CREATE TABLE "AIMessage" (
   "sessionId" TEXT NOT NULL REFERENCES "AISession"(id) ON DELETE CASCADE,
   "role" TEXT NOT NULL,
   "content" TEXT NOT NULL,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Newsletter Subscribers Table
 CREATE TABLE "NewsletterSubscriber" (
   "id" TEXT PRIMARY KEY,
   "email" TEXT UNIQUE NOT NULL,
-  "isActive" BOOLEAN DEFAULT true,
-  "subscribedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "unsubscribedAt" TIMESTAMP
+  is_active BOOLEAN DEFAULT true,
+  subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  unsubscribed_at TIMESTAMP
 );
 
 -- Workspace Projects Table
@@ -163,8 +163,8 @@ CREATE TABLE "WorkspaceProject" (
   "description" TEXT,
   "ownerId" TEXT REFERENCES "User"(id),
   "status" TEXT,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Workspace Tasks Table
@@ -177,10 +177,10 @@ CREATE TABLE "WorkspaceTask" (
   "priority" "TaskPriority" DEFAULT 'MEDIUM',
   "assigneeId" TEXT REFERENCES "User"(id),
   "assigneeName" TEXT,
-  "dueDate" TIMESTAMP,
-  "completedAt" TIMESTAMP,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  due_date TIMESTAMP,
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Audit Logs Table
@@ -188,12 +188,12 @@ CREATE TABLE "AuditLog" (
   "id" TEXT PRIMARY KEY,
   "action" TEXT NOT NULL,
   "entity" TEXT NOT NULL,
-  "entityId" TEXT,
-  "userId" TEXT REFERENCES "User"(id),
+  entity_id TEXT,
+  user_id TEXT REFERENCES "User"(id),
   "details" TEXT,
-  "ipAddress" TEXT,
-  "userAgent" TEXT,
-  "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Indexes
